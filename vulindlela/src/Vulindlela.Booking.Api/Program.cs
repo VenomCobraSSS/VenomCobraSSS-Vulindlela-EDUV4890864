@@ -1,8 +1,33 @@
+using Microsoft.AspNetCore.Authorization;
+using Microsoft.EntityFrameworkCore;
+using Vulindlela.Booking.Api.Authorisation;
+using Vulindlela.Booking.Api.Services;
+
 var builder = WebApplication.CreateBuilder(args);
 
 // Add services to the container.
-// Learn more about configuring OpenAPI at https://aka.ms/aspnet/openapi
-builder.Services.AddOpenApi();
+
+builder.Services.AddControllers();
+builder.Services.AddEndpointsApiExplorer();
+
+builder.Services.AddDbContext<BookingDbContext>(options => options.UseSqlite(
+        builder.Configuration.GetConnectionString("DefaultConnection")));
+
+builder.Services.AddScoped<IAppointmentRepository, AppointmentRepository>();
+
+builder.Services.AddScoped<IAppointmentService, AppointmentService>();
+
+builder.Services.AddHttpClient<IClearanceClient, ClearanceClient>();
+
+builder.Services.AddAuthorization(options =>
+{
+    options.AddPolicy("CitizenRecordPolicy", policy =>
+    {
+        policy.Requirements.Add(new CitizenRecordRequirement());
+    });
+});
+
+builder.Services.AddSingleton<IAuthorizationHandler, CitizenRecordHandler>();
 
 var app = builder.Build();
 
@@ -14,28 +39,17 @@ if (app.Environment.IsDevelopment())
 
 app.UseHttpsRedirection();
 
-var summaries = new[]
-{
-    "Freezing", "Bracing", "Chilly", "Cool", "Mild", "Warm", "Balmy", "Hot", "Sweltering", "Scorching"
-};
+app.UseAuthentication();
+app.UseAuthorization();
 
-app.MapGet("/weatherforecast", () =>
+app.MapControllers();
+
+using (var scope = app.Services.CreateScope())
 {
-    var forecast =  Enumerable.Range(1, 5).Select(index =>
-        new WeatherForecast
-        (
-            DateOnly.FromDateTime(DateTime.Now.AddDays(index)),
-            Random.Shared.Next(-20, 55),
-            summaries[Random.Shared.Next(summaries.Length)]
-        ))
-        .ToArray();
-    return forecast;
-})
-.WithName("GetWeatherForecast");
+    var db =
+        scope.ServiceProvider.GetRequiredService<BookingDbContext>();
+
+    db.Database.EnsureCreated();
+}
 
 app.Run();
-
-record WeatherForecast(DateOnly Date, int TemperatureC, string? Summary)
-{
-    public int TemperatureF => 32 + (int)(TemperatureC / 0.5556);
-}
