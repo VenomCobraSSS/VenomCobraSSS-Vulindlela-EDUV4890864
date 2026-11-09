@@ -1,0 +1,29 @@
+﻿@model List<Vulindlela.Portal.Models.AppointmentViewModel>
+
+<h2>My Appointments</h2>
+
+@if(ViewBag.Warning != null)
+{
+    <p>@ViewBag.Warning</p>
+}
+
+<table>
+    <thead>
+        <tr>
+            <th>Date</th>
+            <th>Service</th>
+            <th>Clearance Status</th>
+        </tr>
+    </thead>
+
+    <tbody>
+    @foreach(var appointment in Model)
+    {
+        <tr>
+            <td>@appointment.AppointmentDate</td>
+            <td>@appointment.ServiceType</td>
+            <td>@appointment.ClearanceStatus</td>
+        </tr>
+    }
+    </tbody>
+</table>

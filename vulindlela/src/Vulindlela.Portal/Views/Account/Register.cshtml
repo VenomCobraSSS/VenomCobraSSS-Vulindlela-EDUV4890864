@@ -1,0 +1,24 @@
+﻿@model Vulindlela.Portal.Models.RegisterViewModel
+
+<h2>Register</h2>
+
+<form method="post">
+
+    <label>Username</label>
+    <input asp-for="Username"/>
+
+    <br/>
+
+    <label>Password</label>
+    <input asp-for="Password" type="password"/>
+
+    <br/>
+
+    <label>Confirm Password</label>
+    <input asp-for="ConfirmPassword" type="password"/>
+
+    <br/>
+
+    <button type="submit">Register</button>
+
+</form>
