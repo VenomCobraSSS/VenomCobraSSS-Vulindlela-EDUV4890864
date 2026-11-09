@@ -11,7 +11,7 @@ builder.Services.AddControllers();
 builder.Services.AddEndpointsApiExplorer();
 
 builder.Services.AddDbContext<BookingDbContext>(options => options.UseSqlite(
-        builder.Configuration.GetConnectionString("DefaultConnection")));
+        builder.Configuration.GetConnectionString("Data Source=Bookings.db")));
 
 builder.Services.AddScoped<IAppointmentRepository, AppointmentRepository>();
 
@@ -28,6 +28,8 @@ builder.Services.AddAuthorization(options =>
 });
 
 builder.Services.AddSingleton<IAuthorizationHandler, CitizenRecordHandler>();
+
+builder.WebHost.UseUrls("http://localhost:5401");
 
 var app = builder.Build();
 
