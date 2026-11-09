@@ -31,6 +31,8 @@ builder.Services
 
 builder.Services.AddAuthorization();
 
+builder.WebHost.UseUrls("http://localhost:5403");
+
 var app = builder.Build();
 
 using (var scope = app.Services.CreateScope())
